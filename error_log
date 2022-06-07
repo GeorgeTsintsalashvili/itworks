@@ -1,0 +1,2 @@
+[30-Apr-2021 09:18:27 UTC] PHP Fatal error:  Maximum execution time of 30 seconds exceeded in /home/itworksg/application/vendor/symfony/process/Process.php on line 1194
+[02-Jun-2021 10:45:31 UTC] PHP Fatal error:  Maximum execution time of 30 seconds exceeded in /home/itworksg/application/vendor/symfony/process/Pipes/UnixPipes.php on line 94
