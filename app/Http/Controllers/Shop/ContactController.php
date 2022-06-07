@@ -64,21 +64,21 @@ class ContactController extends Controllers\Controller
             $placeholders = ["{name}", "{email}", "{phone}", "{message}"];
             $valuesToPlace = [$parameters["name"], $parameters["email"], $parameters["phone"], $parameters["message"]];
 
-            $recipientAddress = "itworksg@itworks.ge";
-            $subject = "Contact page message";
-            $senderName = "ITWorks";
-            $senderAddress = "info@itw.ge";
+            $recipientAddress = "";
+            $subject = "";
+            $senderName = "";
+            $senderAddress = "";
             $messageToSend = str_replace($placeholders, $valuesToPlace, $htmlText);
             $headers = ["MIME-Version: 1.0", "Content-Type: text/html;charset=utf-8"];
 
             $mailer = new PHPMailer();
 
             $mailer -> CharSet = "UTF-8";
-            $mailer -> Host = "mail.itw.ge";
+            $mailer -> Host = "";
 
             $mailer -> SMTPAuth = true;
-            $mailer -> Username = "info@itw.ge";
-            $mailer -> Password = "Unicef1993$";
+            $mailer -> Username = "";
+            $mailer -> Password = "";
             $mailer -> SMTPSecure = "ssl";
             $mailer -> Port = 465;
 
