@@ -2,8 +2,8 @@
 
 namespace App\Helpers;
 
-class Paginator{
-
+class Paginator
+{
     private $pages = [];
     private $maxPage = 1;
     private $currentPage = 1;
