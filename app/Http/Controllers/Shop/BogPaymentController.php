@@ -14,18 +14,18 @@ use GuzzleHttp\Exception\ClientException;
 class BogPaymentController extends Controller
 {
     private $clientId = '8843';
-    private $secretKey = '0b396d4a4082e49ac9904e5f8d856ba7';
-    private $authAddress = 'https://ipay.ge/opay/api/v1/oauth2/token';
+    private $secretKey = '';
+    private $authAddress = '';
     private $authJsonResponse = null;
-    private $requireOrderForCardPaymentAddress = 'https://ipay.ge/opay/api/v1/checkout/orders';
-    private $cardPaymentInfoAddress = 'https://ipay.ge/opay/api/v1/checkout/orders/';
-    private $requireOrderForInstallmentAddress = 'https://installment.bog.ge/v1/installment/checkout';
+    private $requireOrderForCardPaymentAddress = '';
+    private $cardPaymentInfoAddress = '';
+    private $requireOrderForInstallmentAddress = '';
 
-    private $installmentInfoAddress = 'https://installment.bog.ge/v1/installment/checkout/';
-    private $cardPaymentSiteRedirectUri = '/shop/orders';
-    private $siteSuccessRedirectUri = '/shop/payment/success';
-    private $siteFailureRedirectUri = '/shop/payment/failure';
-    private $bankAuthKey = '0375d5df033bab60ff351f6082e5f3d495fa6c2aaee31455a3525a5d5e90e13bbf';
+    private $installmentInfoAddress = '';
+    private $cardPaymentSiteRedirectUri = '';
+    private $siteSuccessRedirectUri = '';
+    private $siteFailureRedirectUri = '';
+    private $bankAuthKey = '';
 
     private function merchantAuth()
     {
