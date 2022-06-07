@@ -288,8 +288,8 @@ class BogPaymentController extends Controller
             ]);
 
             $smsProviderFormData = [
-              'key' => 'b1268d5d7a1341419ccf8c3e82befb8f',
-              'destination' => '591844448',
+              'key' => '',
+              'destination' => '',
               'sender' => 'ITWorks.ge',
               'content' => 'შეკვეთის აიდი: ' . $parameters['shop_order_id'],
               'urgent' => true
