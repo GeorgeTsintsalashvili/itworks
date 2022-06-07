@@ -142,7 +142,7 @@ class InvoiceController extends Controller
           $recipientAddress = $formData['email'];
           $subject = "ITWorks ინვოისი";
           $senderName = "ITWorks";
-          $senderAddress = "info@itw.ge";
+          $senderAddress = "";
           $headers = ["MIME-Version: 1.0", "Content-Type: text/html;charset=utf-8"];
 
           $mailer = new PHPMailer();
@@ -152,8 +152,8 @@ class InvoiceController extends Controller
 
           $mailer -> SMTPAuth = true;
         //  $mailer -> SMTPDebug = 3;
-          $mailer -> Username = "info@itw.ge";
-          $mailer -> Password = "Unicef1993$";
+          $mailer -> Username = "";
+          $mailer -> Password = "";
           $mailer -> SMTPSecure = "ssl";
           $mailer -> Port = 465;
 
