@@ -23,6 +23,18 @@ class User extends Authenticatable implements MustVerifyEmail
   protected $guard = 'shopUser';
   protected $table = 'shop_users';
 
+  protected $fillable = [
+      'name', 'email', 'phone', 'password',
+  ];
+
+  protected $hidden = [
+      'password', 'remember_token'
+  ];
+
+  protected $casts = [
+      'email_verified_at' => 'datetime',
+  ];
+    
   public function sendPasswordResetNotification($token)
   {
       $this -> notify(new ShopUserResetPasswordNotification($token));
@@ -69,16 +81,4 @@ class User extends Authenticatable implements MustVerifyEmail
   {
     return MessageBox::where('shop_user_id', $this -> id) -> first();
   }
-
-  protected $fillable = [
-      'name', 'email', 'phone', 'password',
-  ];
-
-  protected $hidden = [
-      'password', 'remember_token'
-  ];
-
-  protected $casts = [
-      'email_verified_at' => 'datetime',
-  ];
 }
