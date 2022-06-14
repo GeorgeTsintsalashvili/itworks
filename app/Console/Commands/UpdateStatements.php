@@ -44,7 +44,7 @@ class UpdateStatements extends Command
       $superVipStatementsToUpdate = \DB::table('statements') -> select($columns) -> join('statements_categories', 'statements_categories.id', '=', 'statements.categoryId') -> where('updateEnabled', 1) -> where('superVip', 1) -> get();
       $ordinaryStatementsToUpdate = \DB::table('statements') -> select($columns) -> join('statements_categories', 'statements_categories.id', '=', 'statements.categoryId') -> where('updateEnabled', 1) -> where('superVip', 0) -> get();
 
-      if($superVipStatementsToUpdate -> count())
+      if ($superVipStatementsToUpdate -> count())
       {
         $this -> updateSuperVipStatements($superVipStatementsToUpdate);
       }
@@ -63,7 +63,7 @@ class UpdateStatements extends Command
 
       $userSessionData = \DB::table('statements_data') -> first();
 
-      if($userSessionData)
+      if ($userSessionData)
       {
         $userSession = $userSessionData -> sessionText;
         $statementsUpdateAddress = 'https://www.mymarket.ge/ka/mypage/updatepr/';
@@ -79,7 +79,7 @@ class UpdateStatements extends Command
 
             $statementUpdatePermited = $this -> getUpdatePermissionBasedOnSchedule($schedule);
 
-              if($statementUpdatePermited)
+              if ($statementUpdatePermited)
               {
                 $identifiers = explode(', ', $commaSeparatedIdentifiers);
 
@@ -89,7 +89,7 @@ class UpdateStatements extends Command
 
                 $statementUpdated = $this -> sendStatementUpdateRequest($statementsUpdateAddress, $userSession, $statementsUpdateFormData);
 
-                if($statementUpdated) \DB::table('statements') -> where('id', $statement -> id) -> update(['lastUpdateTimestamp' => time()]);
+                if ($statementUpdated) \DB::table('statements') -> where('id', $statement -> id) -> update(['lastUpdateTimestamp' => time()]);
               }
          });
 
@@ -105,7 +105,7 @@ class UpdateStatements extends Command
 
       $userSessionData = \DB::table('statements_data') -> first();
 
-      if($userSessionData)
+      if ($userSessionData)
       {
         $userSession = $userSessionData -> sessionText;
 
@@ -123,7 +123,7 @@ class UpdateStatements extends Command
 
         $userSuperVipStatementsPage = $this -> getUserSuperVipStatementsPageText($userSuperVipStatementsPageAddress, $userSession, $userSuperVipStatmentsPageformData);
 
-        if($userSuperVipStatementsPage)
+        if ($userSuperVipStatementsPage)
         {
           $superVipStatementsToUpdate -> each(function($statement) use($userSuperVipStatementsPage, $userSuperVipStatementsPageAddress, $superVipStatmentsPageAddress, $statementsUpdateAddress, $userIdKey, $desiredUserId, $userSession){
 
@@ -133,45 +133,45 @@ class UpdateStatements extends Command
 
                $statementUpdatePermited = $this -> getUpdatePermissionBasedOnSchedule($schedule);
 
-               if($statementUpdatePermited)
+               if ($statementUpdatePermited)
                {
                  $superVipStatementsIdentifiersOnUserPage = [];
                  $identifiers = explode(', ', $commaSeparatedIdentifiers);
 
                  foreach($identifiers as $identifier)
                  {
-                   if(strpos($userSuperVipStatementsPage, $identifier) !== false)
+                   if (strpos($userSuperVipStatementsPage, $identifier) !== false)
                    {
                      $superVipStatementsIdentifiersOnUserPage[] = $identifier;
                    }
                  }
 
-                 if(count($superVipStatementsIdentifiersOnUserPage))
+                 if (count($superVipStatementsIdentifiersOnUserPage))
                  {
                    $superVipStatementsPageformData = ['CatID' => $categoryId];
 
                    $superVipStatementsPageResponse = $this -> getSuperVipStatements($superVipStatmentsPageAddress, $superVipStatementsPageformData);
 
-                   if($superVipStatementsPageResponse)
+                   if ($superVipStatementsPageResponse)
                    {
                      $desiredUserStatementIsFirst = $this -> desiredUserStatementIsFirst($superVipStatementsPageResponse, $userIdKey, $desiredUserId);
 
-                     if(!$desiredUserStatementIsFirst)
+                     if (!$desiredUserStatementIsFirst)
                      {
-                       $statementsUpdateFormData = ['PrIDs' => $superVipStatementsIdentifiersOnUserPage,
-                                                    'UpdateTypeID' => '0',
-                                                    'Quantity' => '1'];
+                       $statementsUpdateFormData = [
+                           'PrIDs' => $superVipStatementsIdentifiersOnUserPage,
+                           'UpdateTypeID' => '0',
+                           'Quantity' => '1'
+                       ];
 
                        $statementUpdated = $this -> sendStatementUpdateRequest($statementsUpdateAddress, $userSession, $statementsUpdateFormData);
 
-                       if($statementUpdated) \DB::table('statements') -> where('id', $statement -> id) -> update(['lastUpdateTimestamp' => time()]);
+                       if ($statementUpdated) \DB::table('statements') -> where('id', $statement -> id) -> update(['lastUpdateTimestamp' => time()]);
                      }
                    }
                  }
                }
           });
-
-          // method end
         }
       }
     }
@@ -182,22 +182,24 @@ class UpdateStatements extends Command
     {
       $updateSuccess = false;
 
-      $headers = ['Cookie' => $session,
-                  'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.193 Safari/537.36',
-                  'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-                  'Accept-Encoding' => 'gzip, deflate, br'];
+      $headers = [
+          'Cookie' => $session,
+          'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.193 Safari/537.36',
+          'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+          'Accept-Encoding' => 'gzip, deflate, br'
+      ];
 
       $response = Http::withHeaders($headers) -> asForm() -> post($statementsUpdateAddress, $formData);
 
-      if($response -> successful())
+      if ($response -> successful())
       {
          $responseData = $response -> json();
 
-         if(isset($responseData['StatusCode']))
+         if (isset($responseData['StatusCode']))
          {
            $statusCode = (int) $responseData['StatusCode'];
 
-           if($statusCode == 1)
+           if ($statusCode == 1)
 
            $updateSuccess = true;
          }
@@ -210,10 +212,12 @@ class UpdateStatements extends Command
 
     protected function getUserSuperVipStatementsPageText($address, $cookie, $formData)
     {
-      $headers = ['Cookie' => $cookie,
-                  'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.193 Safari/537.36',
-                  'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-                  'Accept-Encoding' => 'gzip, deflate, br'];
+      $headers = [
+          'Cookie' => $cookie,
+          'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.193 Safari/537.36',
+          'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+          'Accept-Encoding' => 'gzip, deflate, br'
+      ];
 
       $response = Http::withHeaders($headers) -> get($address, $formData);
 
@@ -224,9 +228,11 @@ class UpdateStatements extends Command
 
     protected function getSuperVipStatements($address, $formData)
     {
-      $headers = ['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.193 Safari/537.36',
-                  'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-                  'Accept-Encoding' => 'gzip, deflate, br'];
+      $headers = [
+          'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.193 Safari/537.36',
+          'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+          'Accept-Encoding' => 'gzip, deflate, br'
+      ];
 
       $query = http_build_query($formData);
 
@@ -234,11 +240,11 @@ class UpdateStatements extends Command
 
       $statements = null;
 
-      if($response -> successful())
+      if ($response -> successful())
       {
         $data = $response -> json();
 
-        if($data) $statements = $data;
+        if ($data) $statements = $data;
       }
 
       return $statements;
@@ -250,23 +256,23 @@ class UpdateStatements extends Command
     {
       $userStatementIsFirst = false;
 
-      if(isset($response['Data']))
+      if (isset($response['Data']))
       {
         $statements = $response['Data'];
 
-        if(isset($statements['Prs']))
+        if (isset($statements['Prs']))
         {
           $statements = $statements['Prs'];
 
-          if(count($statements))
+          if (count($statements))
           {
             $firstStatement = current($statements);
 
-            if(isset($firstStatement[$userIdKey]))
+            if (isset($firstStatement[$userIdKey]))
             {
               $firstStatementUserId = $firstStatement[$userIdKey];
 
-              if($firstStatementUserId === $desiredUserId)
+              if ($firstStatementUserId === $desiredUserId)
 
               $userStatementIsFirst = true;
             }
@@ -281,8 +287,6 @@ class UpdateStatements extends Command
 
     protected function getUpdatePermissionBasedOnSchedule($schedule)
     {
-      date_default_timezone_set('Asia/Tbilisi');
-
       $updatePermited = false;
 
       $currentTimestamp = time();
@@ -299,38 +303,38 @@ class UpdateStatements extends Command
 
       $allowedMinutesIntervals = [1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30];
 
-      if(preg_match($anyHourPattern, $schedule) && $currentMinutes == 60)
+      if (preg_match($anyHourPattern, $schedule) && $currentMinutes == 60)
       {
         $updatePermited = true;
       }
 
-      else if(preg_match($anyHourSpecificMinuteIntervalPattern, $schedule))
+      else if (preg_match($anyHourSpecificMinuteIntervalPattern, $schedule))
       {
         $scheduleParts = preg_split('/\:/', $schedule);
         $minutesInterval = (int) $scheduleParts[1];
 
-        if(in_array($minutesInterval, $allowedMinutesIntervals) && ($currentMinutes % $minutesInterval) == 0)
+        if (in_array($minutesInterval, $allowedMinutesIntervals) && ($currentMinutes % $minutesInterval) == 0)
         {
           $updatePermited = true;
         }
       }
 
-      else if(preg_match($specificHoursPattern, $schedule))
+      else if (preg_match($specificHoursPattern, $schedule))
       {
         $specificHoursSchedule = preg_replace('/\[|\]/', '', $schedule);
         $specificHoursSchedule = preg_split('/\|/', $specificHoursSchedule);
         $specificHoursSchedule = array_unique($specificHoursSchedule);
 
-        foreach($specificHoursSchedule as $key => $value)
+        foreach ($specificHoursSchedule as $key => $value)
 
         $specificHoursSchedule[$key] = (int) $value;
 
-        if(in_array($currentHour, $specificHoursSchedule) && $currentMinutes == 60)
+        if (in_array($currentHour, $specificHoursSchedule) && $currentMinutes == 60)
 
         $updatePermited = true;
       }
 
-      else if(preg_match($specificHoursMinutesIntervalPattern, $schedule))
+      else if (preg_match($specificHoursMinutesIntervalPattern, $schedule))
       {
         $specificHoursMinutesSchedule = preg_split('/\:/', $schedule);
 
@@ -339,23 +343,23 @@ class UpdateStatements extends Command
         $specificHoursScheduleParts = array_unique($specificHoursScheduleParts);
         $minutesInterval = (int) $specificHoursMinutesSchedule[1];
 
-        foreach($specificHoursScheduleParts as $key => $value)
+        foreach ($specificHoursScheduleParts as $key => $value)
         {
           $specificHoursScheduleParts[$key] = (int) $value;
         }
 
-        if(in_array($minutesInterval, $allowedMinutesIntervals) && in_array($currentHour, $specificHoursScheduleParts))
+        if (in_array($minutesInterval, $allowedMinutesIntervals) && in_array($currentHour, $specificHoursScheduleParts))
 
         $updatePermited = true;
       }
 
-      else if(preg_match($specificHoursRangesPattern, $schedule))
+      else if (preg_match($specificHoursRangesPattern, $schedule))
       {
         $specificHoursRangeSchedule = preg_replace('/\[|\]/', '', $schedule);
         $specificHoursRangeSchedule = preg_split('/\|/', $specificHoursRangeSchedule);
         $specificHoursRangeSchedule = array_unique($specificHoursRangeSchedule);
 
-        foreach($specificHoursRangeSchedule as $specificRange)
+        foreach ($specificHoursRangeSchedule as $specificRange)
         {
           $specificRangeParts = explode('-', $specificRange);
 
@@ -371,27 +375,27 @@ class UpdateStatements extends Command
         }
       }
 
-      else if(preg_match($specificHoursRangesMinutesIntervalPattern, $schedule))
+      else if (preg_match($specificHoursRangesMinutesIntervalPattern, $schedule))
       {
         $specificHoursRangesMinutesIntervalSchedule = preg_split('/\:/', $schedule);
 
         $minutesInterval = (int) $specificHoursRangesMinutesIntervalSchedule[1];
 
-        if(in_array($minutesInterval, $allowedMinutesIntervals) && ($currentMinutes % $minutesInterval) == 0)
+        if (in_array($minutesInterval, $allowedMinutesIntervals) && ($currentMinutes % $minutesInterval) == 0)
         {
           $specificHoursRanges = preg_replace('/\[|\]/', '', $specificHoursRangesMinutesIntervalSchedule[0]);
 
           $specificHoursRangesParts = preg_split('/\|/', $specificHoursRanges);
           $specificHoursRangesParts = array_unique($specificHoursRangesParts);
 
-          foreach($specificHoursRangesParts as $specificRange)
+          foreach ($specificHoursRangesParts as $specificRange)
           {
             $specificRangeParts = explode('-', $specificRange);
 
             $lowerBound = (int) $specificRangeParts[0];
             $upperBound = (int) $specificRangeParts[1];
 
-            if($lowerBound <= $currentHour && $currentHour <= $upperBound)
+            if ($lowerBound <= $currentHour && $currentHour <= $upperBound)
             {
               $updatePermited = true;
 
