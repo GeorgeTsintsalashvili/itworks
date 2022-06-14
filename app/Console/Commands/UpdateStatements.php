@@ -49,7 +49,7 @@ class UpdateStatements extends Command
         $this -> updateSuperVipStatements($superVipStatementsToUpdate);
       }
 
-      if($ordinaryStatementsToUpdate -> count())
+      if ($ordinaryStatementsToUpdate -> count())
       {
         $this -> updateNonSuperVipStatements($ordinaryStatementsToUpdate);
       }
