@@ -59,8 +59,6 @@ class UpdateStatements extends Command
 
     protected function updateNonSuperVipStatements($statementsToUpdate)
     {
-      date_default_timezone_set('Asia/Tbilisi');
-
       $userSessionData = \DB::table('statements_data') -> first();
 
       if ($userSessionData)
@@ -83,9 +81,11 @@ class UpdateStatements extends Command
               {
                 $identifiers = explode(', ', $commaSeparatedIdentifiers);
 
-                $statementsUpdateFormData = ['PrIDs' => $identifiers,
-                                             'UpdateTypeID' => '0',
-                                             'Quantity' => '1'];
+                $statementsUpdateFormData = [
+                    'PrIDs' => $identifiers,
+                    'UpdateTypeID' => '0',
+                    'Quantity' => '1'
+                ];
 
                 $statementUpdated = $this -> sendStatementUpdateRequest($statementsUpdateAddress, $userSession, $statementsUpdateFormData);
 
@@ -116,10 +116,12 @@ class UpdateStatements extends Command
         $userIdKey = 'user_id';
         $desiredUserId = '2267332';
 
-        $userSuperVipStatmentsPageformData = ['MypageSearchKBD' => 'on',
-                                              'StatusID' => '1',
-                                              'DateTypeID' => '0',
-                                              'Prom' => '20'];
+        $userSuperVipStatmentsPageformData = [
+            'MypageSearchKBD' => 'on',
+            'StatusID' => '1',
+            'DateTypeID' => '0',
+            'Prom' => '20'
+        ];
 
         $userSuperVipStatementsPage = $this -> getUserSuperVipStatementsPageText($userSuperVipStatementsPageAddress, $userSession, $userSuperVipStatmentsPageformData);
 
