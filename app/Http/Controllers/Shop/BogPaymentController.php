@@ -13,19 +13,22 @@ use GuzzleHttp\Exception\ClientException;
 
 class BogPaymentController extends Controller
 {
-    private $clientId = '8843';
-    private $secretKey = '';
-    private $authAddress = '';
+    private $clientId = '556876';
+    private $secretKey = '45364fghfghgfhfg5645fghfghfg';
+    private $authAddress = 'https://ipay.ge/opay/api/v1/oauth2/token';
+    private $bankAuthKey = '5fgghfg6767dfsds2309676';
     private $authJsonResponse = null;
-    private $requireOrderForCardPaymentAddress = '';
-    private $cardPaymentInfoAddress = '';
-    private $requireOrderForInstallmentAddress = '';
+    private $authResponse = null;
 
-    private $installmentInfoAddress = '';
-    private $cardPaymentSiteRedirectUri = '';
-    private $siteSuccessRedirectUri = '';
-    private $siteFailureRedirectUri = '';
-    private $bankAuthKey = '';
+    private $requireOrderForCardPaymentAddress = 'https://ipay.ge/opay/api/v1/checkout/orders';
+    private $cardPaymentInfoAddress = 'https://ipay.ge/opay/api/v1/checkout/orders/';
+    private $cardPaymentSiteRedirectUri = '/shop/payment/orderInfo/bog/';
+
+    private $installmentInfoAddress = 'https://installment.bog.ge/v1/installment/checkout/';
+    private $requireOrderForInstallmentAddress = 'https://installment.bog.ge/v1/installment/checkout';
+    private $installmentSuccessRedirectUri = '/shop/payment/installment/bog/success/';
+    private $installmentFailureRedirectUri = '/shop/payment/installment/bog/failure/';
+    private $installmentRejectionRedirectUri = '/shop/payment/installment/bog/rejection/';
 
     private function merchantAuth()
     {
@@ -55,12 +58,12 @@ class BogPaymentController extends Controller
         $jsonData['intent'] = 'CAPTURE';
         $jsonData['items'] = $this -> getBankCompliantOrderItemsForCardPayment($orderItems);
         $jsonData['shop_order_id'] = $order -> id;
-        $jsonData['redirect_url'] = url('/') . $this -> cardPaymentSiteRedirectUri;
+        $jsonData['redirect_url'] = url('/') . $this -> cardPaymentSiteRedirectUri . $order -> id;
         $jsonData['purchase_units'] = [
           [
             'amount' => [
               'currency_code' => 'GEL',
-              'value' => '0.1' // $order -> order_price
+              'value' => $order -> order_price
             ]
           ]
         ];
@@ -90,13 +93,13 @@ class BogPaymentController extends Controller
 
         catch (ClientException $exception)
         {
-          // dd($exception -> getResponse() -> getBody() -> getContents());
+          // $exception -> getResponse() -> getBody() -> getContents()
 
-          return Redirect::to('/shop/payment/failure?reason=technical');
+          return Redirect::to(route('bogTechnicalFailure'));
         }
       }
 
-      return Redirect::to('/shop/payment/failure?reason=technical');
+      return Redirect::to(route('bogTechnicalFailure'));
     }
 
     public function requireInstallmentForOrder($order)
@@ -110,14 +113,16 @@ class BogPaymentController extends Controller
           'Authorization' => 'Bearer ' . $this -> authResponse['access_token']
         ];
 
+        $url = url('/');
+
         $jsonData['intent'] = 'LOAN';
         $jsonData['installment_month'] = $order -> months;
         $jsonData['installment_type'] = 'STANDARD';
         $jsonData['cart_items'] = $this -> getBankCompliantOrderItemsForInstallment($order -> orderItems);
         $jsonData['shop_order_id'] = $order -> id;
-        $jsonData['success_redirect_url'] = url('/') . $this -> siteSuccessRedirectUri . '?method=installment';
-        $jsonData['fail_redirect_url'] = url('/') . $this -> siteFailureRedirectUri . '?error=failure';
-        $jsonData['reject_redirect_url'] = url('/') . $this -> siteFailureRedirectUri . '?error=rejected';
+        $jsonData['success_redirect_url'] = $url . $this -> installmentSuccessRedirectUri . $order -> id;
+        $jsonData['fail_redirect_url'] = $url . $this -> installmentFailureRedirectUri . $order -> id;
+        $jsonData['reject_redirect_url'] = $url . $this -> installmentRejectionRedirectUri . $order -> id;
         $jsonData['validate_items'] = false;
         $jsonData['locale'] = 'ka';
         $jsonData['purchase_units'] = [
@@ -254,18 +259,23 @@ class BogPaymentController extends Controller
       {
         $response['keysMatch'] = true;
 
-        $parameters = $request -> only(['status', 'order_id', 'payment_hash', 'ipay_payment_id', 'status_description', 'shop_order_id', 'payment_method', 'card_type']);
+        $parameters = $request -> only(['status', 'order_id', 'shop_order_id', 'payment_method']);
 
         $rules = [
-          'status' => 'required|string',
-          'order_id' => 'required|string',
-          'payment_hash' => 'required|string',
-          'ipay_payment_id' => 'required|string',
-          'status_description' => 'required|string',
-          'shop_order_id' => 'required|string',
-          'payment_method' => 'required|string',
-          'card_type' => 'required|string'
+          'status' => 'required|string', // ikos
+          'order_id' => 'required|string', // ikos
+       //   'payment_hash' => 'required|string',
+       //   'ipay_payment_id' => 'required|string',
+       //   'status_description' => 'required|string',
+          'shop_order_id' => 'required|string',//ikos
+          'payment_method' => 'required|string', // ikos
+         // 'card_type' => 'required|string'
         ];
+        
+        
+     //   $json = json_encode($parameters);
+        
+     //   file_put_contents('test.txt', $json);
 
         $validator = \Validator::make($parameters, $rules);
 
@@ -288,10 +298,10 @@ class BogPaymentController extends Controller
             ]);
 
             $smsProviderFormData = [
-              'key' => '',
-              'destination' => '',
+              'key' => '45456456fghgfhgf5645654hfghfg',
+              'destination' => '591844448',
               'sender' => 'ITWorks.ge',
-              'content' => 'შეკვეთის აიდი: ' . $parameters['shop_order_id'],
+              'content' => 'გადახდილი შეკვეთის id: ' . $parameters['shop_order_id'],
               'urgent' => true
             ];
 
