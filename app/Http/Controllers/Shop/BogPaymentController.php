@@ -16,7 +16,7 @@ class BogPaymentController extends Controller
     private $clientId = '556876';
     private $secretKey = '45364fghfghgfhfg5645fghfghfg';
     private $authAddress = 'https://ipay.ge/opay/api/v1/oauth2/token';
-    private $bankAuthKey = '5fgghfg6767dfsds2309676';
+    private $bankAuthKey = '5fgghfg6767dfsds2309676'; // created by me for callback
     private $authJsonResponse = null;
     private $authResponse = null;
 
